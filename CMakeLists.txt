@@ -29,7 +29,7 @@ set(APP_PATH            ${BLE_BOOTLOADER_SOURCE_DIR}/DefaultApp.hex
     CACHE FILE          "Default application to bundle with the bootloader")
 
 set(SOFT_DEVICE         ${MBED_SRC_PATH}/targets/hal/TARGET_NORDIC/TARGET_MCU_NRF51822/Lib/s130_nrf51822_1_0_0/s130_nrf51_1.0.0_softdevice.hex)
-set(PLATFORM            HRM1017
+set(PLATFORM            ARCH_BLE
     CACHE DIRECTORY     "Target platform (NRF51822, ARCH_BLE, HRM1017...)")
 set(BOARD               ${PLATFORM}
     CACHE DIRECTORY     "Target board (NRF51822_MKIT, ARCH_BLE, HRM1017...)")
