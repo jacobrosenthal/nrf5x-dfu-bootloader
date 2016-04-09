@@ -7,6 +7,12 @@
 
 cmake_minimum_required (VERSION 2.8)
 
+set(TOOLCHAIN_SYSROOT   "C:/Keil_v5/ARM/ARMCC"
+    CACHE DIRECTORY     "Path to an ARM toolchain") # potential setting for TOOLCHAIN_SYSROOT: ~/ext/arm-toolchains/rvct/ARMCompiler_5.03_117_Linux
+# decide about the actual compilers to be used ...
+set(CMAKE_CXX_COMPILER ${TOOLCHAIN_SYSROOT}/bin/armcc.exe)
+set(CMAKE_C_COMPILER   ${TOOLCHAIN_SYSROOT}/bin/armcc.exe)
+
 # The name of our project is "BLE_BOOTLOADER". CMakeLists files in this project can
 # refer to the root source directory of the project as ${BLE_BOOTLOADER_SOURCE_DIR}
 # and to the root binary directory of the project as ${BLE_BOOTLOADER_BINARY_DIR}.
@@ -27,9 +33,6 @@ set(PLATFORM            HRM1017
     CACHE DIRECTORY     "Target platform (NRF51822, ARCH_BLE, HRM1017...)")
 set(BOARD               ${PLATFORM}
     CACHE DIRECTORY     "Target board (NRF51822_MKIT, ARCH_BLE, HRM1017...)")
-
-set(TOOLCHAIN_SYSROOT   /usr/local/
-    CACHE DIRECTORY     "Path to an ARM toolchain") # potential setting for TOOLCHAIN_SYSROOT: ~/ext/arm-toolchains/rvct/ARMCompiler_5.03_117_Linux
 
 # It's best to hide all the details of setting up the variable SRCS in a CMake
 # macro. The macro can then be called in all the project CMake list files to add
@@ -57,9 +60,7 @@ macro (add_sources)
 endmacro()
 
 # decide about the actual compilers to be used ...
-set(CMAKE_CXX_COMPILER ${TOOLCHAIN_SYSROOT}/bin/armcc)
-set(CMAKE_C_COMPILER   ${TOOLCHAIN_SYSROOT}/bin/armcc)
-set(LINKER             ${TOOLCHAIN_SYSROOT}/bin/armlink)
+set(LINKER             ${TOOLCHAIN_SYSROOT}/bin/armlink.exe)
 set(SIZE_COMMAND       size)
 set(MAIN_TARGET        ${PROJECT_NAME}.elf)
 set(HEX_TARGET         ${PROJECT_NAME}.hex)
@@ -151,6 +152,7 @@ include_directories(
 
 # Generic compiler flags
 add_definitions(
+    -c
     --cpu=Cortex-M0
     --apcs=interwork
     --enum_is_int
@@ -230,15 +232,15 @@ add_executable(${MAIN_TARGET} ${SRCS})
 
 # Add a post-build dependency like printing size of the
 # resulting binary and copying to the target.
-add_custom_command(
-    # Show ELF size
-    TARGET ${MAIN_TARGET}
-    COMMAND ${SIZE_COMMAND} ${MAIN_TARGET}
-)
+#add_custom_command(
+#    # Show ELF size
+#    TARGET ${MAIN_TARGET}
+#    COMMAND ${SIZE_COMMAND} ${MAIN_TARGET}
+#)
 
 add_custom_target(${HEX_TARGET} ALL
     DEPENDS ${MAIN_TARGET}
-    COMMAND ${TOOLCHAIN_SYSROOT}/bin/fromelf --i32combined -o ${PROJECT_NAME}.hex ${MAIN_TARGET}
+    COMMAND ${TOOLCHAIN_SYSROOT}/bin/fromelf.exe --i32combined -o ${PROJECT_NAME}.hex ${MAIN_TARGET}.exe
     COMMAND srec_cat ${PROJECT_NAME}.hex -intel
         # Change bootloader settings: BANK0 now contains a valid application
         -exclude 0x3FC00 0x3FC20
